@@ -7,39 +7,49 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
-INPUT_FILENAME = 'input.txt'
-ENCRYPTED_FILENAME = 'encrypted_{input_filename}'.format(input_filename=INPUT_FILENAME)
-DECRYPTED_FILENAME = 'decrypted_{input_filename}'.format(input_filename=INPUT_FILENAME)
-CHUNK_SIZE = 1024
+def get_aes(password):
+    # Password-Based Key Derivation hash-based message authentication code
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt='pretend its random',
+        iterations=100000,
+        backend=default_backend()
+    )
+    key = base64.urlsafe_b64encode(kdf.derive(password))
+    print(key)
+    print(password)
+    return Fernet(key)
 
-password = bytes(input('Password: '), encoding='UTF-8')
-salt = os.urandom(16)
-# Password-Based Key Derivation hash-based message authentication code
-kdf = PBKDF2HMAC(
-    algorithm=hashes.SHA256(),
-    length=32,
-    salt=salt,
-    iterations=100000,
-    backend=default_backend()
-)
-key = base64.urlsafe_b64encode(kdf.derive(password))
-aes_crypto = Fernet(key)
+if __name__ == '__main__':
+    DEFAULT_INPUT_FILENAME = 'input.txt'
+    CHUNK_SIZE = 1024
 
-# Encrypt
-with open(INPUT_FILENAME, 'rb') as infile:
-    with open(ENCRYPTED_FILENAME, 'wb') as outfile:
-        while True:
-            chunk = infile.read(CHUNK_SIZE)
-            if len(chunk) == 0:
-                    break
-            else:
-                outfile.write(aes_crypto.encrypt(chunk))
+    user_filename = input("File to encrypt (leave blank for use '{}'): ".format(DEFAULT_INPUT_FILENAME))
+    input_filename = user_filename if user_filename else DEFAULT_INPUT_FILENAME
 
-# Decrypt
-with open(ENCRYPTED_FILENAME, 'rb') as infile:
-        with open(DECRYPTED_FILENAME, 'wb') as outfile:
+    ENCRYPTED_FILENAME = 'enc_{input_filename}'.format(input_filename=input_filename)
+    DECRYPTED_FILENAME = 'dec_{input_filename}'.format(input_filename=input_filename)
+
+    password = bytes(input('Password: '), encoding='UTF-8')
+
+    aes_crypto = get_aes(password)
+
+    # Encrypt
+    with open(input_filename, 'rb') as infile:
+        with open(ENCRYPTED_FILENAME, 'wb') as outfile:
             while True:
                 chunk = infile.read(CHUNK_SIZE)
                 if len(chunk) == 0:
-                    break
-                outfile.write(aes_crypto.decrypt(chunk))
+                        break
+                else:
+                    outfile.write(aes_crypto.encrypt(chunk))
+
+    # Decrypt
+    with open(ENCRYPTED_FILENAME, 'rb') as infile:
+            with open(DECRYPTED_FILENAME, 'wb') as outfile:
+                while True:
+                    chunk = infile.read(CHUNK_SIZE)
+                    if len(chunk) == 0:
+                        break
+                    outfile.write(aes_crypto.decrypt(chunk))
