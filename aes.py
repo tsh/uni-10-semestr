@@ -1,5 +1,4 @@
-import base64
-import os
+import base64, os
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
@@ -12,7 +11,7 @@ def get_aes(password):
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
-        salt='pretend its random',
+        salt=b'pretend its random',
         iterations=100000,
         backend=default_backend()
     )
@@ -42,8 +41,9 @@ if __name__ == '__main__':
                 chunk = infile.read(CHUNK_SIZE)
                 if len(chunk) == 0:
                         break
-                else:
-                    outfile.write(aes_crypto.encrypt(chunk))
+                elif len(chunk) % 16 != 0:
+                    chunk += b' ' * (16 - len(chunk) % 16)
+                outfile.write(aes_crypto.encrypt(chunk))
 
     # Decrypt
     with open(ENCRYPTED_FILENAME, 'rb') as infile:
