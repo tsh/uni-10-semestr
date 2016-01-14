@@ -16,8 +16,6 @@ def get_aes(password):
         backend=default_backend()
     )
     key = base64.urlsafe_b64encode(kdf.derive(password))
-    print(key)
-    print(password)
     return Fernet(key)
 
 if __name__ == '__main__':
