@@ -1,6 +1,8 @@
 import pyaes
 import hashlib
 
+# TODO: try python 2.7
+
 # Any mode of operation can be used; for this example CTR
 inp = input('Password: ')
 key = bytes(hashlib.sha1(bytes(inp, encoding='UTF-8')).hexdigest()[0:32], encoding='UTF-8')
