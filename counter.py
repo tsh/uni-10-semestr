@@ -55,7 +55,10 @@ total_vals_enc = sum(enc_fq.values())
 percent_enc = count_percent(enc_fq, total_vals_enc)
 
 
-print('Pos\tBit\tInput\tEncrypted')
-for position in range(8):
-    for bit in (0, 1):
-        print('{p}\t{b}\t{orig}\t{enc}'.format(p=position, b=bit, orig=percent_orig[(position, bit)], enc=percent_enc[(position, bit)]))
+# print('Pos\tBit\tInput\tEncrypted')
+# for position in range(8):
+#     for bit in (0, 1):
+#         print('{p}\t{b}\t{orig}\t{enc}'.format(p=position, b=bit, orig=percent_orig[(position, bit)], enc=percent_enc[(position, bit)]))
+
+print('Input: ', [percent_orig[(pos, bit)] for bit in (0, 1) for pos in range(8)])
+print('Encrt: ',[percent_enc[(pos, bit)] for bit in (0, 1) for pos in range(8)])
