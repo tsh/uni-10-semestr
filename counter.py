@@ -22,7 +22,7 @@ def bits4file(filename):
 
 
 def count_fq(bits_arrs):
-    fq = {}
+    fq = {(7,1):0}
     for bit_arr in bits_arrs:
         for i, bit in enumerate(bit_arr):
             try:
@@ -35,11 +35,12 @@ def count_fq(bits_arrs):
 def count_percent(fq, total):
     result = {}
     for position in range(8):
-        for bit in (0, 1):
-            try:
-                result[(position, bit)] = round(fq[(position, bit)] / total * 100, 3)
-            except KeyError:
-                result[(position, bit)] = 0
+        s = fq[(position, 0)] + fq[(position, 1)]
+        try:
+            result[(position, 0)] = round(fq[(position, 0)] / s * 100, 0)
+            result[(position, 1)] = round(fq[(position, 1)] / s * 100, 0)
+        except KeyError:
+            result[(position, bit)] = 0
     return result
 
 
@@ -57,4 +58,4 @@ percent_enc = count_percent(enc_fq, total_vals_enc)
 print('Pos\tBit\tInput\tEncrypted')
 for position in range(8):
     for bit in (0, 1):
-        pass
+        print('{p}\t{b}\t{orig}\t{enc}'.format(p=position, b=bit, orig=percent_orig[(position, bit)], enc=percent_enc[(position, bit)]))
